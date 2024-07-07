@@ -23,6 +23,6 @@ public class User {
     @Column(nullable = false, unique = true, length = 100)
     private String email;
 
-    @OneToMany(mappedBy = "createdBy", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "createdBy", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<Note> notes = new HashSet<>();
 }
