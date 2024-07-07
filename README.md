@@ -7,9 +7,6 @@ Users are able to register accounts through `/accounts` REST apis
 Users are able to Create/Update/Fetch/Delete notes through `/notes` REST apis
 
 Data are stored at MySQL database
-- username: admin
-- password: admin
-
 
 # Setup needed
 1. Install your local MySQL database
