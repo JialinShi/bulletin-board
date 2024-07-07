@@ -13,8 +13,8 @@ Data are stored at MySQL database
 
 # Setup needed
 1. Install your local MySQL database
-2. Create database named `bulletin_boards`
-3. Create account with name `admin` and password as `admin`# bulletin-board
+2. Create database named `bulletin_board`
+3. Create account with name `bulletin_admin` and password as `bulletin_admin`
 
 # Major Contributions
 1. [Create User related entities](https://github.com/JialinShi/bulletin-board/pull/1) 
