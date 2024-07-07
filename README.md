@@ -17,7 +17,7 @@ Data are stored at MySQL database
 3. Create account with name `admin` and password as `admin`# bulletin-board
 
 # Major Contributions
-1. Create User related entities: https://github.com/JialinShi/bulletin-board/pull/1
+1. Create User related entities: https://github.com/JialinShi/bulletin-board/pull/1   
 
 # Curl Tests
 **Create user**
