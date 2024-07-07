@@ -14,7 +14,8 @@ Data are stored at MySQL database
 3. Create account with name `bulletin_admin` and password as `bulletin_admin`
 
 # Major Contributions
-1. [Implement User functionalities](https://github.com/JialinShi/bulletin-board/pull/1) 
+1. [Implement User functionalities](https://github.com/JialinShi/bulletin-board/pull/1)
+2. [Unit test for UserService](https://github.com/JialinShi/bulletin-board/pull/3)
 
 # Curl Tests
 **Create user**
