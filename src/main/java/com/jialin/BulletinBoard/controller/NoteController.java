@@ -95,11 +95,11 @@ public class NoteController {
      * @return:
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteNote(@PathVariable Long noteId, @RequestParam Long userId) {
+    public ResponseEntity<Void> deleteNote(@PathVariable Long id, @RequestParam Long userId) {
         User user = _userService.getUserById(userId);
-        Note existingNote = _noteService.getNoteById(noteId);
+        Note existingNote = _noteService.getNoteById(id);
         if (existingNote != null && existingNote.getCreatedBy().equals(user)) {
-            _noteService.deleteNote(noteId);
+            _noteService.deleteNote(id);
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.badRequest().build();
