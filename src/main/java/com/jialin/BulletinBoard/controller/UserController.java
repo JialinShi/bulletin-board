@@ -13,34 +13,34 @@ import java.util.List;
 public class UserController {
 
     @Autowired
-    private UserService userService;
+    private UserService _userService;
 
     @PostMapping
     public ResponseEntity<User> createUser(@RequestBody User user) {
-        User newUser = userService.saveUser(user);
+        User newUser = _userService.saveUser(user);
         return ResponseEntity.ok(newUser);
     }
 
     @GetMapping
     public List<User> getAllUsers() {
-        return userService.getAllUsers();
+        return _userService.getAllUsers();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
-        User user = userService.getUserById(id);
+        User user = _userService.getUserById(id);
         return ResponseEntity.ok(user);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User userDetails) {
-        User updatedUser = userService.updateUser(id, userDetails);
+        User updatedUser = _userService.updateUser(id, userDetails);
         return ResponseEntity.ok(updatedUser);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
+        _userService.deleteUser(id);
         return ResponseEntity.ok().build();
     }
 }
