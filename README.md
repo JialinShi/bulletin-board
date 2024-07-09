@@ -18,6 +18,9 @@ Data are stored at MySQL database
 2. [Unit test for UserService](https://github.com/JialinShi/bulletin-board/pull/3)
 
 # Curl Tests
+
+## UserController
+
 **Create user**
 ```
 curl -X POST 'http://localhost:8080/api/users' \
@@ -51,6 +54,8 @@ curl -X PUT 'http://localhost:8080/api/users/1' \
 ```
 curl -X DELETE 'http://localhost:8080/api/users/1'
 ```
+
+## NoteController
 
 **Create note**
 ```
