@@ -17,10 +17,10 @@ import static org.mockito.MockitoAnnotations.*;
 class UserServiceTests {
 
     @Mock
-    private UserRepository userRepository;
+    private UserRepository _userRepository;
 
     @InjectMocks
-    private UserService userService;
+    private UserService _userService;
 
     @BeforeEach
     void setUp() {
@@ -34,14 +34,14 @@ class UserServiceTests {
         user.setPassword("password_1"); // Normally you'd want this encrypted
         user.setEmail("user_1@gmail.com");
 
-        when(userRepository.save(any(User.class))).thenReturn(user);
+        when(_userRepository.save(any(User.class))).thenReturn(user);
 
-        User createdUser = userService.saveUser(user);
+        User createdUser = _userService.saveUser(user);
 
         assertNotNull(createdUser);
         assertEquals("user_1", createdUser.getUsername());
         assertEquals("password_1", createdUser.getPassword()); // password_1 is not encrypted
-        verify(userRepository).save(any(User.class));
+        verify(_userRepository).save(any(User.class));
     }
 
     @Test
@@ -50,9 +50,9 @@ class UserServiceTests {
         user.setId(1L);
         user.setUsername("user_1");
 
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(_userRepository.findById(1L)).thenReturn(Optional.of(user));
 
-        User foundUser = userService.getUserById(1L);
+        User foundUser = _userService.getUserById(1L);
 
         assertNotNull(foundUser);
         assertEquals("user_1", foundUser.getUsername());
@@ -71,25 +71,25 @@ class UserServiceTests {
         newUserDetails.setPassword("password_2");
         newUserDetails.setEmail("user_2@gmail.com");
 
-        when(userRepository.findById(1L)).thenReturn(Optional.of(existingUser));
-        when(userRepository.save(any(User.class))).thenReturn(newUserDetails);
+        when(_userRepository.findById(1L)).thenReturn(Optional.of(existingUser));
+        when(_userRepository.save(any(User.class))).thenReturn(newUserDetails);
 
-        User user_2 = userService.updateUser(1L, newUserDetails);
+        User user_2 = _userService.updateUser(1L, newUserDetails);
 
         assertNotNull(user_2);
         assertEquals("user_2", user_2.getUsername());
         assertEquals("password_2", user_2.getPassword()); // Note password_1 is also not encrypted
-        verify(userRepository).save(any(User.class));
+        verify(_userRepository).save(any(User.class));
     }
 
     @Test
     void testDeleteUser() {
         Long userId = 1L;
 
-        doNothing().when(userRepository).deleteById(userId);
+        doNothing().when(_userRepository).deleteById(userId);
 
-        userService.deleteUser(userId);
+        _userService.deleteUser(userId);
 
-        verify(userRepository).deleteById(userId);
+        verify(_userRepository).deleteById(userId);
     }
 }

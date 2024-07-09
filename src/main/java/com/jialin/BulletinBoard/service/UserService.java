@@ -16,30 +16,30 @@ import java.util.List;
 public class UserService {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserRepository _userRepository;
 
     public User saveUser(User user) {
         user.setPassword(user.getPassword());
-        return userRepository.save(user);
+        return _userRepository.save(user);
     }
 
     public List<User> getAllUsers() {
-        return userRepository.findAll();
+        return _userRepository.findAll();
     }
 
     public User getUserById(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found with id " + id));
+        return _userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found with id " + id));
     }
 
     public User updateUser(Long id, User userDetails) {
-        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found with id " + id));
+        User user = _userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found with id " + id));
         user.setUsername(userDetails.getUsername());
         user.setEmail(userDetails.getEmail());
         user.setPassword(userDetails.getPassword());
-        return userRepository.save(user);
+        return _userRepository.save(user);
     }
 
     public void deleteUser(Long id) {
-        userRepository.deleteById(id);
+        _userRepository.deleteById(id);
     }
 }
