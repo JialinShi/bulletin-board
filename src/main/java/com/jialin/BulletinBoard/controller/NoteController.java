@@ -5,10 +5,7 @@ import com.jialin.BulletinBoard.models.User;
 import com.jialin.BulletinBoard.service.NoteService;
 import com.jialin.BulletinBoard.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.server.reactive.AbstractListenerServerHttpResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -90,7 +87,7 @@ public class NoteController {
     /**
      * Delete the note with id
      *
-     * @param noteId: id of the note to be deleted
+     * @param id: id of the note to be deleted
      * @param userId: id of the user who wants to delete this note
      * @return:
      */
