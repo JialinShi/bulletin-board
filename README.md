@@ -16,6 +16,7 @@ Data are stored at MySQL database
 # Major Contributions
 1. [Implement User functionalities](https://github.com/JialinShi/bulletin-board/pull/1)
 2. [Unit test for UserService](https://github.com/JialinShi/bulletin-board/pull/3)
+3. [Implement Note functionalities](https://github.com/JialinShi/bulletin-board/commit/d521ddce912af857d0d89c111cd7fb7698d86f00)
 
 # Curl Tests
 
