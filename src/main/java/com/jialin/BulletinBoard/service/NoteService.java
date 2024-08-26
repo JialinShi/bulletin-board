@@ -27,7 +27,7 @@ public class NoteService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Content fails to pass toxic check");
         }
         note.setCreatedBy(user);
-        return ResponseEntity.ok(note);
+        return ResponseEntity.ok(_noteRepository.save(note));
     }
 
     public List<Note> getAllNotes() {
