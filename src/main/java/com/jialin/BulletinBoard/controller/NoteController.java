@@ -30,8 +30,7 @@ public class NoteController {
     @PostMapping
     public ResponseEntity<Note> createNote(@RequestBody Note note, @RequestParam Long userId) {
         User user = _userService.getUserById(userId);
-        Note createdNote = _noteService.saveNote(note, user);
-        return ResponseEntity.ok(createdNote);
+        return _noteService.saveNote(note, user);
     }
 
     /**
