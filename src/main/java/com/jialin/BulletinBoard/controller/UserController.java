@@ -3,11 +3,13 @@ package com.jialin.BulletinBoard.controller;
 import com.jialin.BulletinBoard.models.User;
 import com.jialin.BulletinBoard.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -18,7 +20,8 @@ public class UserController {
     @PostMapping
     public ResponseEntity<User> createUser(@RequestBody User user) {
         User newUser = _userService.saveUser(user);
-        return ResponseEntity.ok(newUser);
+        newUser.setPassword(null);
+        return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
     }
 
     @GetMapping

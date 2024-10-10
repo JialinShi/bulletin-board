@@ -22,12 +22,20 @@ public class NoteService {
     @Autowired
     private ContentCheckService _contentCheckService;
 
-    public ResponseEntity<Note> saveNote(Note note, User user) {
+    public ResponseEntity<Note> saveNoteResponse(Note note, User user) {
         if (_contentCheckService.isToxic(note.getContent())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Content fails to pass toxic check");
         }
         note.setCreatedBy(user);
         return ResponseEntity.ok(_noteRepository.save(note));
+    }
+
+    public Note saveNote(Note note, User user) {
+        if (_contentCheckService.isToxic(note.getContent())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Content fails to pass toxic check");
+        }
+        note.setCreatedBy(user);
+        return _noteRepository.save(note);
     }
 
     public List<Note> getAllNotes() {
@@ -49,6 +57,4 @@ public class NoteService {
     public void deleteNote(Long id) {
         _noteRepository.deleteById(id);
     }
-
-
 }
