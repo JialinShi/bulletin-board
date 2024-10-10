@@ -4,100 +4,97 @@ import com.jialin.BulletinBoard.models.Note;
 import com.jialin.BulletinBoard.models.User;
 import com.jialin.BulletinBoard.service.NoteService;
 import com.jialin.BulletinBoard.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/notes")
+@CrossOrigin(origins = "http://localhost:3000")
 public class NoteController {
 
-    @Autowired
-    private NoteService _noteService;
+    private final NoteService noteService;
+    private final UserService userService;
 
-    @Autowired
-    private UserService _userService;
-
-    /**
-     * Create a note with Note entity and userId
-     *
-     * @param note: the note to be created
-     * @param userId: id of the user who created this note
-     * @return: Note entity created
-     */
-    @PostMapping
-    public ResponseEntity<Note> createNote(@RequestBody Note note, @RequestParam Long userId) {
-        User user = _userService.getUserById(userId);
-        return _noteService.saveNote(note, user);
+    // Constructor injection
+    public NoteController(NoteService noteService, UserService userService) {
+        this.noteService = noteService;
+        this.userService = userService;
     }
 
-    /**
-     * Get all notes by userId
-     *
-     * @param userId: id of the user
-     * @return: List of notes owned by the user with userId
-     */
-    @GetMapping
-    public ResponseEntity<List<Note>> getAllNotes(@RequestParam Long userId) {
-        List<Note> notes = _noteService.getNotesByUserId(userId);
+    @PostMapping
+    public ResponseEntity<Note> createNote(
+            @RequestBody Note note,
+            Authentication authentication
+    ) {
+        User user = userService.findByEmail(authentication.getName());
+        Note createdNote = noteService.saveNote(note, user);
+        return ResponseEntity.ok(createdNote);
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Note>> getAllNotes(
+            @PathVariable Long userId,
+            Authentication authentication
+    ) {
+        User user = userService.findByEmail(authentication.getName());
+        if (!user.getId().equals(userId)) {
+            return ResponseEntity.status(403).build();
+        }
+        List<Note> notes = noteService.getNotesByUserId(userId);
         return ResponseEntity.ok(notes);
     }
 
-    /**
-     * Get not by noteId
-     *
-     * @param id: id of the note
-     * @return: note with the required id
-     */
-    @GetMapping("/{id}")
-    public ResponseEntity<Note> getNoteById(@PathVariable Long id) {
-        Note note = _noteService.getNoteById(id);
-        if (note != null) {
+    @GetMapping("/{noteId}")
+    public ResponseEntity<Note> getNoteById(
+            @PathVariable Long noteId,
+            Authentication authentication
+    ) {
+        User user = userService.findByEmail(authentication.getName());
+        Note note = noteService.getNoteById(noteId);
+        if (note != null && note.getCreatedBy().equals(user)) {
             return ResponseEntity.ok(note);
         }
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.status(404).build();
     }
 
-    /**
-     * Update a note created by the user with userId.
-     * Need to check if this note is owned by the user first, otherwise this call fails.
-     *
-     * @param id: id of the note to be updated
-     * @param updatedNote: updatedNote that will replace the original one
-     * @param userId: id of the user who wants to update this note, has to be the owner to succeed
-     * @return: updated note entity
-     */
-    @PutMapping("/{id}")
-    public ResponseEntity<Note> updateNote(@PathVariable Long id,
-                                           @RequestBody Note updatedNote,
-                                           @RequestParam Long userId) {
-        Note existingNote = _noteService.getNoteById(id);
-        User user = _userService.getUserById(userId);
-        if (existingNote != null && existingNote.getCreatedBy().equals(user)) {
-            existingNote.setContent(updatedNote.getContent());
-            _noteService.saveNote(existingNote, user);
-            return ResponseEntity.ok(existingNote);
+    @PutMapping("/user/{userId}/note/{noteId}")
+    public ResponseEntity<Note> updateNote(
+            @PathVariable Long userId,
+            @PathVariable Long noteId,
+            @RequestBody Note updatedNote,
+            Authentication authentication
+    ) {
+        User user = userService.findByEmail(authentication.getName());
+        if (!user.getId().equals(userId)) {
+            return ResponseEntity.status(403).build();
         }
-        return ResponseEntity.notFound().build();
+        Note existingNote = noteService.getNoteById(noteId);
+        if (existingNote != null && existingNote.getCreatedBy().equals(user)) {
+            existingNote.setTitle(updatedNote.getTitle());
+            existingNote.setContent(updatedNote.getContent());
+            Note savedNote = noteService.saveNote(existingNote, user);
+            return ResponseEntity.ok(savedNote);
+        }
+        return ResponseEntity.status(404).build();
     }
 
-    /**
-     * Delete the note with id
-     *
-     * @param id: id of the note to be deleted
-     * @param userId: id of the user who wants to delete this note
-     * @return:
-     */
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteNote(@PathVariable Long id, @RequestParam Long userId) {
-        User user = _userService.getUserById(userId);
-        Note existingNote = _noteService.getNoteById(id);
+    @DeleteMapping("/user/{userId}/note/{noteId}")
+    public ResponseEntity<Void> deleteNote(
+            @PathVariable Long userId,
+            @PathVariable Long noteId,
+            Authentication authentication
+    ) {
+        User user = userService.findByEmail(authentication.getName());
+        if (!user.getId().equals(userId)) {
+            return ResponseEntity.status(403).build();
+        }
+        Note existingNote = noteService.getNoteById(noteId);
         if (existingNote != null && existingNote.getCreatedBy().equals(user)) {
-            _noteService.deleteNote(id);
+            noteService.deleteNote(noteId);
             return ResponseEntity.ok().build();
         }
-        return ResponseEntity.badRequest().build();
+        return ResponseEntity.status(400).build();
     }
 }
