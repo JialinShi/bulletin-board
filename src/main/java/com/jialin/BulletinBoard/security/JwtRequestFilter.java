@@ -4,6 +4,7 @@ import com.jialin.BulletinBoard.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,24 +14,21 @@ import io.jsonwebtoken.JwtException;
 
 import java.io.IOException;
 
+@Slf4j
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
 
     private final UserService userService;
     private final JwtUtil jwtUtil;
 
-    // Constructor injection
     public JwtRequestFilter(UserService userService, JwtUtil jwtUtil) {
         this.userService = userService;
         this.jwtUtil = jwtUtil;
     }
 
     @Override
-    protected void doFilterInternal(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain chain
-    ) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+            throws ServletException, IOException {
 
         final String authorizationHeader = request.getHeader("Authorization");
 
@@ -42,7 +40,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             try {
                 username = jwtUtil.extractUsername(jwt);
             } catch (JwtException e) {
-                // Invalid JWT token
+                log.error("Fail to validate user authentication info: " + username);
             }
         }
 
@@ -50,9 +48,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             UserDetails userDetails = this.userService.loadUserByUsername(username);
 
             if (jwtUtil.validateToken(jwt, userDetails)) {
-                var authenticationToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities()
-                );
+                var authenticationToken =
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
         }

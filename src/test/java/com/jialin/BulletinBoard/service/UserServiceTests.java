@@ -6,90 +6,149 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.MockitoAnnotations.*;
 
 class UserServiceTests {
 
     @Mock
-    private UserRepository _userRepository;
+    private UserRepository userRepository;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
-    private UserService _userService;
+    private UserService userService;
 
     @BeforeEach
     void setUp() {
-        initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    void testSaveUser() {
+    void saveUser_ShouldEncodePasswordAndSaveUser() {
         User user = new User();
-        user.setUsername("user_1");
-        user.setPassword("password_1"); // Normally you'd want this encrypted
-        user.setEmail("user_1@gmail.com");
+        user.setPassword("plainPassword");
+        when(passwordEncoder.encode(any())).thenReturn("encodedPassword");
+        when(userRepository.save(any(User.class))).thenReturn(user);
 
-        when(_userRepository.save(any(User.class))).thenReturn(user);
+        User savedUser = userService.saveUser(user);
 
-        User createdUser = _userService.saveUser(user);
-
-        assertNotNull(createdUser);
-        assertEquals("user_1", createdUser.getUsername());
-        assertEquals("password_1", createdUser.getPassword()); // password_1 is not encrypted
-        verify(_userRepository).save(any(User.class));
+        assertNotNull(savedUser);
+        assertEquals("encodedPassword", savedUser.getPassword());
+        verify(userRepository, times(1)).save(user);
+        verify(passwordEncoder, times(1)).encode("plainPassword");
     }
 
     @Test
-    void testGetUserById() {
+    void getAllUsers_ShouldReturnListOfUsers() {
+        List<User> users = new ArrayList<>();
+        users.add(new User());
+        when(userRepository.findAll()).thenReturn(users);
+
+        List<User> result = userService.getAllUsers();
+
+        assertEquals(1, result.size());
+        verify(userRepository, times(1)).findAll();
+    }
+
+    @Test
+    void getUserById_ShouldReturnUser_WhenUserExists() {
         User user = new User();
-        user.setId(1L);
-        user.setUsername("user_1");
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
-        when(_userRepository.findById(1L)).thenReturn(Optional.of(user));
+        User result = userService.getUserById(1L);
 
-        User foundUser = _userService.getUserById(1L);
-
-        assertNotNull(foundUser);
-        assertEquals("user_1", foundUser.getUsername());
+        assertNotNull(result);
+        verify(userRepository, times(1)).findById(1L);
     }
 
     @Test
-    void testUpdateUser() {
+    void getUserById_ShouldThrowException_WhenUserDoesNotExist() {
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(UsernameNotFoundException.class, () -> userService.getUserById(1L));
+        verify(userRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    void updateUser_ShouldUpdateUserDetails() {
         User existingUser = new User();
         existingUser.setId(1L);
-        existingUser.setUsername("user_1");
-        existingUser.setPassword("password_1");
-        existingUser.setEmail("user_1@gmail.com");
+        User updatedDetails = new User();
+        updatedDetails.setUsername("newUsername");
+        updatedDetails.setEmail("newEmail");
+        updatedDetails.setPassword("newPassword");
 
-        User newUserDetails = new User();
-        newUserDetails.setUsername("user_2");
-        newUserDetails.setPassword("password_2");
-        newUserDetails.setEmail("user_2@gmail.com");
+        when(userRepository.findById(1L)).thenReturn(Optional.of(existingUser));
+        when(userRepository.save(any(User.class))).thenReturn(existingUser);
 
-        when(_userRepository.findById(1L)).thenReturn(Optional.of(existingUser));
-        when(_userRepository.save(any(User.class))).thenReturn(newUserDetails);
+        User result = userService.updateUser(1L, updatedDetails);
 
-        User user_2 = _userService.updateUser(1L, newUserDetails);
-
-        assertNotNull(user_2);
-        assertEquals("user_2", user_2.getUsername());
-        assertEquals("password_2", user_2.getPassword()); // Note password_1 is also not encrypted
-        verify(_userRepository).save(any(User.class));
+        assertEquals("newUsername", result.getUsername());
+        assertEquals("newEmail", result.getEmail());
+        assertEquals("newPassword", result.getPassword());
+        verify(userRepository, times(1)).save(existingUser);
     }
 
     @Test
-    void testDeleteUser() {
-        Long userId = 1L;
+    void deleteUser_ShouldCallRepositoryDeleteById() {
+        doNothing().when(userRepository).deleteById(1L);
 
-        doNothing().when(_userRepository).deleteById(userId);
+        userService.deleteUser(1L);
 
-        _userService.deleteUser(userId);
+        verify(userRepository, times(1)).deleteById(1L);
+    }
 
-        verify(_userRepository).deleteById(userId);
+    @Test
+    void findByEmail_ShouldReturnUser_WhenEmailExists() {
+        User user = new User();
+        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+
+        User result = userService.findByEmail("test@example.com");
+
+        assertNotNull(result);
+        verify(userRepository, times(1)).findByEmail("test@example.com");
+    }
+
+    @Test
+    void findByEmail_ShouldThrowException_WhenEmailDoesNotExist() {
+        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.empty());
+
+        assertThrows(UsernameNotFoundException.class, () -> userService.findByEmail("test@example.com"));
+        verify(userRepository, times(1)).findByEmail("test@example.com");
+    }
+
+    @Test
+    void loadUserByUsername_ShouldReturnUserDetails_WhenEmailExists() {
+        User user = new User();
+        user.setEmail("test@example.com");
+        user.setPassword("password");
+        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+
+        UserDetails userDetails = userService.loadUserByUsername("test@example.com");
+
+        assertNotNull(userDetails);
+        assertEquals("test@example.com", userDetails.getUsername());
+        assertEquals("password", userDetails.getPassword());
+        verify(userRepository, times(1)).findByEmail("test@example.com");
+    }
+
+    @Test
+    void loadUserByUsername_ShouldThrowException_WhenEmailDoesNotExist() {
+        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.empty());
+
+        assertThrows(UsernameNotFoundException.class, () -> userService.loadUserByUsername("test@example.com"));
+        verify(userRepository, times(1)).findByEmail("test@example.com");
     }
 }
