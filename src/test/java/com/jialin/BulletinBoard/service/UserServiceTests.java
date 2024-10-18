@@ -36,7 +36,7 @@ class UserServiceTests {
     }
 
     @Test
-    void saveUser_ShouldEncodePasswordAndSaveUser() {
+    void testSaveUser() {
         User user = new User();
         user.setPassword("plainPassword");
         when(passwordEncoder.encode(any())).thenReturn("encodedPassword");
@@ -51,7 +51,7 @@ class UserServiceTests {
     }
 
     @Test
-    void getAllUsers_ShouldReturnListOfUsers() {
+    void testGetAllUsers() {
         List<User> users = new ArrayList<>();
         users.add(new User());
         when(userRepository.findAll()).thenReturn(users);
@@ -63,7 +63,7 @@ class UserServiceTests {
     }
 
     @Test
-    void getUserById_ShouldReturnUser_WhenUserExists() {
+    void testGetUserById() {
         User user = new User();
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
@@ -74,7 +74,7 @@ class UserServiceTests {
     }
 
     @Test
-    void getUserById_ShouldThrowException_WhenUserDoesNotExist() {
+    void testGetUserByIdNotExist() {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThrows(UsernameNotFoundException.class, () -> userService.getUserById(1L));
@@ -82,7 +82,7 @@ class UserServiceTests {
     }
 
     @Test
-    void updateUser_ShouldUpdateUserDetails() {
+    void testUpdateUser() {
         User existingUser = new User();
         existingUser.setId(1L);
         User updatedDetails = new User();
@@ -102,7 +102,7 @@ class UserServiceTests {
     }
 
     @Test
-    void deleteUser_ShouldCallRepositoryDeleteById() {
+    void testDeleteUser() {
         doNothing().when(userRepository).deleteById(1L);
 
         userService.deleteUser(1L);
@@ -111,7 +111,7 @@ class UserServiceTests {
     }
 
     @Test
-    void findByEmail_ShouldReturnUser_WhenEmailExists() {
+    void testFindByEmail() {
         User user = new User();
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
 
@@ -122,7 +122,7 @@ class UserServiceTests {
     }
 
     @Test
-    void findByEmail_ShouldThrowException_WhenEmailDoesNotExist() {
+    void testFindByEmailNotExist() {
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.empty());
 
         assertThrows(UsernameNotFoundException.class, () -> userService.findByEmail("test@example.com"));
@@ -130,7 +130,7 @@ class UserServiceTests {
     }
 
     @Test
-    void loadUserByUsername_ShouldReturnUserDetails_WhenEmailExists() {
+    void testLoadUserByUsername() {
         User user = new User();
         user.setEmail("test@example.com");
         user.setPassword("password");
@@ -145,7 +145,7 @@ class UserServiceTests {
     }
 
     @Test
-    void loadUserByUsername_ShouldThrowException_WhenEmailDoesNotExist() {
+    void testLoadUserByUsernameNotExist() {
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.empty());
 
         assertThrows(UsernameNotFoundException.class, () -> userService.loadUserByUsername("test@example.com"));
