@@ -24,15 +24,15 @@ This is a bulletin board application where users are able to
 
 ### Architecture 
 
-<img src="https://github.com/user-attachments/assets/6357574f-15e5-455d-9bbe-0e1f5075df3e" width="600" height="400" alt="bulletin-board" />
+<img src="https://github.com/user-attachments/assets/291d5b9f-e616-47b4-9010-2e6189507910" width="700" height="600" alt="bulletin-board" />
 
 
-#### Athentication - [AuthController.java](https://github.com/JialinShi/bulletin-board/blob/main/src/main/java/com/jialin/BulletinBoard/controller/AuthController.java)
+### Athentication - [AuthController.java](https://github.com/JialinShi/bulletin-board/blob/main/src/main/java/com/jialin/BulletinBoard/controller/AuthController.java)
 
 This module only has one method login(), which accepts POST requests for user log in.  
 Leveraging **AuthenticationManager** to validate user's log in request, if authentication request passed, user details will be read from database and [JwtUtil](https://github.com/JialinShi/bulletin-board/blob/main/src/main/java/com/jialin/BulletinBoard/security/JwtUtil.java) is utilized to generate a JWT token as a prove of this authenticated user, then returned to user session. 
 <br>
-#### User Operations - [UserController.java](https://github.com/JialinShi/bulletin-board/blob/main/src/main/java/com/jialin/BulletinBoard/controller/UserController.java)
+### User Operations - [UserController.java](https://github.com/JialinShi/bulletin-board/blob/main/src/main/java/com/jialin/BulletinBoard/controller/UserController.java)
 
 This controller manages [User](https://github.com/JialinShi/bulletin-board/blob/main/src/main/java/com/jialin/BulletinBoard/models/User.java) related operations within the system, providing a RESTful interface for creating, retrieving, updating, and deleting user information.  
 
@@ -50,7 +50,7 @@ Defined under the `/api/users` route, the `UserController` integrates various en
 
 The class leverages Spring's `@Autowired` to inject the [UserService](https://github.com/JialinShi/bulletin-board/blob/main/src/main/java/com/jialin/BulletinBoard/service/UserService.java), which encapsulates all the business logic for user management. 
 <br>
-#### Note Operations - [NoteController.java](https://github.com/JialinShi/bulletin-board/blob/main/src/main/java/com/jialin/BulletinBoard/controller/NoteController.java)
+### Note Operations - [NoteController.java](https://github.com/JialinShi/bulletin-board/blob/main/src/main/java/com/jialin/BulletinBoard/controller/NoteController.java)
 
 This controller manages [Note](https://github.com/JialinShi/bulletin-board/blob/main/src/main/java/com/jialin/BulletinBoard/models/Note.java) related operations within the system, providing a RESTful interface for creating, retrieving, updating, and deleting notes. 
 
@@ -68,6 +68,9 @@ Defined under the `/api/notes` route, the `NoteController` integrates various en
 
 The class leverages Spring's `@Autowired` to inject [NoteService](https://github.com/JialinShi/bulletin-board/blob/main/src/main/java/com/jialin/BulletinBoard/service/NoteService.java) and [UserService](https://github.com/JialinShi/bulletin-board/blob/main/src/main/java/com/jialin/BulletinBoard/service/UserService.java), which encapsulates all business logic related to note management. 
 
+#### Toxic Content Detection 
+When creating a new note or updating an existing note, [ContentCheckService](https://github.com/JialinShi/bulletin-board/blob/main/src/main/java/com/jialin/BulletinBoard/service/ContentCheckService.java) is triggered to evaluate content toxic socre by leveraging Google Perspective. Notes with toxic content is prohibited from being created/updated. 
+![image](https://github.com/user-attachments/assets/66a5cae0-de11-4e8f-9f78-812334c6cdd6)
 
 
 
