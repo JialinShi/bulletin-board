@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:3000")
 public class AuthController {
 
     @Autowired
@@ -41,7 +40,9 @@ public class AuthController {
         final String jwt = jwtUtil.generateToken(userDetails);
 
         User user = userService.findByEmail(loginRequest.getEmail());
-        user.setPassword(null); // Do not return the password
+
+        // remove password from entity to avoid information breach
+        user.setPassword(null);
 
         return ResponseEntity.ok(new AuthenticationResponse(jwt, user));
     }

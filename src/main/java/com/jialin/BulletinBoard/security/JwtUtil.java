@@ -12,7 +12,8 @@ import java.util.function.Function;
 @Service
 public class JwtUtil {
 
-    private static final long JWT_EXPIRATION_MS = 10 * 60 * 60 * 1000; // 10 hours
+    // Set jwt expiration time as 10 hours
+    private static final long JWT_EXPIRATION_MS = 10 * 60 * 60 * 1000;
 
     @Value("${jwt.secret}")
     private String secretKey;
